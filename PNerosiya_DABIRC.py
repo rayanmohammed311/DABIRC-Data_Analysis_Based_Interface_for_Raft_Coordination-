@@ -3,13 +3,9 @@ import streamlit.components.v1 as components
 import numpy as np
 import plotly.graph_objects as go
 
-# 1. Page Configuration & Title
 st.set_page_config(page_title="DABIRC by Project Nerosiya", layout="wide")
 st.title("Project Nerosiya: Data Analysis Based Interface for Raft Coordination (DABIRC)")
-
 st.sidebar.header("Sand Bed Physical Inputs")
-
-# 2. Toggle to choose between Phone Tilt Sensor or Manual Slider
 use_phone_sensor = st.sidebar.checkbox(
     "Connect Mobile Tilt Sensor", value=False
 )
@@ -18,7 +14,6 @@ affected_raft = st.sidebar.selectbox(
     "Target Raft Node", ["Node (0, 0)", "Node (0, 1)", "Node (1, 2)"]
 )
 
-# 3. Mobile Sensor Component Integration
 settlement_val = 0.0
 
 if use_phone_sensor:
@@ -26,7 +21,6 @@ if use_phone_sensor:
       "**Tilt your phone to control structural settlement:**"
   )
 
-  # Custom HTML/JS component embedded in Streamlit to read phone motion
   phone_sensor_code = """
         <div style="font-family: monospace; padding: 10px; background: #f0f2f6; border-radius: 5px;">
             <b>Live Tilt Data:</b><br>
@@ -57,7 +51,6 @@ if use_phone_sensor:
             }
         </script>
     """
-  # Render the sensor reader component in the sidebar and catch its value
   sensor_output = components.html(phone_sensor_code, height=100)
 
   # If data is being streamed back from the phone, use it; otherwise default to 0
@@ -71,7 +64,6 @@ if use_phone_sensor:
   st.sidebar.info(f"Calculated Settlement Depth: {settlement_val:.1f} mm")
 
 else:
-  # Fallback manual slider if phone sensor mode is turned off
   settlement_val = st.sidebar.slider("Settlement Depth (mm)", 0.0, 25.0, 0.0)
 
 # 4. Matrix Math & Simulation Logic
@@ -81,17 +73,14 @@ active_simulation = st.sidebar.checkbox(
 )
 
 if active_simulation:
-  # Safe parsing of row and column coordinates from dropdown string
   cleaned_str = (
       affected_raft.replace("Node (", "").replace(")", "").replace(" ", "")
   )
   r, c = map(int, cleaned_str.split(","))
 
-  # Ensure indices stay within the 3x3 matrix boundaries
   if 0 <= r < 3 and 0 <= c < 3:
     matrix[r, c] = -settlement_val
 
-# 5. Drawing the 3D Plotly Surface Map
 fig = go.Figure(
     data=[go.Surface(z=matrix, colorscale="RdylGn_r")]
 )
@@ -106,7 +95,7 @@ fig.update_layout(
     margin=dict(l=0, r=0, b=0, t=40),
 )
 
-# 6. Streamlit Page Layout (Columns)
+
 col1, col2 = st.columns([2, 1])
 
 with col1:
